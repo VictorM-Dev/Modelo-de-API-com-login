@@ -340,3 +340,30 @@ public ResponseEntity<Usuario> exibirUsuario(JwtAuthenticationToken token){
 Como o `subject()` da criação do token é o `UUID` , usando o `getName()` podemos recuperar esse valor da própria requisição.
 
 Com esse padrão simples, é possível gerar qualquer requisição seguindo a autenticação via token criada no projeto.
+# Bônus - Aplicando CORS no objeto `HTTP`
+
+```java
+.cors(cors -> cors.configurationSource(request -> {
+	var config = new CorsConfiguration();
+	config.setAllowedOrigins(List.of("http://127.0.0.1:5500"));
+	config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+  config.setAllowedHeaders(List.of("*"));
+  config.setAllowCredentials(true);
+  return config;
+}))
+```
+
+O CORS serve para configurar as requisições de origem cruzada. *O browser costuma bloquear requisições assim.*
+
+Configurações de CORS:
+
+- `cors()` - recebe uma função lambda com o parâmetro `configurationSource()` que recebe outra função lambda.
+    - `setAllowedOrigins()` - recebe uma lista de todos os caminhos que podem fazer requisições a API.
+    - `setAllowedMethods()` - recebe uma lista de todos os métodos que podem ser requeridos pelos caminhos definidos anteriormente.
+    - `setAllowedHeaders()` - recebe uma lista de todos os headers que podem ser mandados;
+    - `setAllowCredentials()` - definido como `true` permite que a API receba credências. *(como esse projeto é STATELESS, ele recebe apenas JWT como credencial).*
+
+      *Note que utilizando o `true` precisamos definir uma origem e não podemos determinar ela com `"*"` .*
+
+
+Note que também é possível inserir um `@CrossOrigin(origin = "caminho")` no começo de cada `controller` para permitir que ele receba requisições naquele endpoint.
